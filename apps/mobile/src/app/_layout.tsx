@@ -1,11 +1,12 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { DatabaseProvider } from '@/data/database/database-provider';
 import { colors } from '@/design/tokens';
 
 export default function RootLayout() {
   return (
-    <>
+    <DatabaseProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -14,6 +15,6 @@ export default function RootLayout() {
           animation: 'fade',
         }}
       />
-    </>
+    </DatabaseProvider>
   );
 }

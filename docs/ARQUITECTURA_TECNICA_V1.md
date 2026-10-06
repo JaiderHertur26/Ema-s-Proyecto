@@ -299,3 +299,44 @@ Toda nueva función debe responder:
 5. ¿Pertenece a la fase actual?
 
 Si alguna respuesta es no, no entra todavía.
+
+
+## 17. Estado de implementación — FASE 3
+
+Actualizado durante la construcción inicial:
+
+- 3.1 Esqueleto Expo + Router — COMPLETADO
+- 3.2 Design system inicial — COMPLETADO
+- 3.3 Persistencia SQLite local — COMPLETADO
+- 3.4 Modelo de dominio inicial — COMPLETADO
+- 3.5 Onboarding local de extremo a extremo — COMPLETADO EN PRIMERA VERSIÓN
+- 3.6 Pantalla HOY conectada al camino activo — BASE FUNCIONAL
+- 3.7 Motor de personalización — SIGUIENTE
+- 3.8 Orar — PENDIENTE
+- 3.9 Recuerdos — PENDIENTE
+- 3.10 Mi Camino — PENDIENTE
+- 3.11 Rutas emocionales — PENDIENTE
+- 3.12 Supabase Auth anónimo — PENDIENTE
+
+### Persistencia actual
+
+La base local usa `expo-sqlite` y está configurada para SQLCipher en builds nativos.
+La clave de 256 bits se genera con `expo-crypto` y se conserva en `expo-secure-store`.
+SQLite usa WAL, claves foráneas y timeout de bloqueo.
+
+El usuario puede abandonar el onboarding y reanudarlo desde el último paso persistido.
+
+### Validaciones actuales
+
+- ESLint: OK
+- TypeScript: OK
+- Expo Doctor: 21/21
+- Export Android: OK
+- Migración SQLite ejecutada contra SQLite real: OK
+- Tablas requeridas: 15/15
+
+### Nota de dependencias
+
+El árbol de Expo reporta avisos de `npm audit` en dependencias transitivas.
+No se ejecuta `npm audit fix --force` porque propone cambios incompatibles con la versión de Expo.
+Se revisará y actualizará mediante versiones compatibles del SDK, sin romper el árbol nativo.

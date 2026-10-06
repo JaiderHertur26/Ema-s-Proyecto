@@ -1,22 +1,30 @@
+import { useState } from 'react';
 import { router } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { setOnboardingRelationship } from '@/data/repositories/onboarding-repository';
 import { colors, radius, shadows, spacing, typeScale } from '@/design/tokens';
-
-const relationships = [
-  ['Mamá', '♥'],
-  ['Papá', '●'],
-  ['Esposo/a', '◯'],
-  ['Hijo/a', '✦'],
-  ['Hermano/a', '●'],
-  ['Abuelo/a', '♟'],
-  ['Familiar', '⌂'],
-  ['Amigo/a', '●'],
-  ['Otra persona', '…'],
-] as const;
+import { relationshipOptions } from '@/domain/relationship-options';
+import type { Relationship } from '@/domain/types';
 
 export default function RelationshipScreen() {
+  const db = useSQLiteContext();
+  const [saving, setSaving] = useState<Relationship | null>(null);
+
+  async function handleSelect(relationship: Relationship) {
+    if (saving) return;
+
+    setSaving(relationship);
+    try {
+      await setOnboardingRelationship(db, relationship);
+      router.push('/onboarding/name');
+    } finally {
+      setSaving(null);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -39,15 +47,20 @@ export default function RelationshipScreen() {
         </View>
 
         <View style={styles.options}>
-          {relationships.map(([label, icon]) => (
+          {relationshipOptions.map((option) => (
             <Pressable
-              key={label}
+              key={option.value}
               accessibilityRole="button"
-              accessibilityLabel={label}
-              onPress={() => {}}
-              style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}>
-              <Text style={styles.icon}>{icon}</Text>
-              <Text style={styles.optionLabel}>{label}</Text>
+              accessibilityLabel={option.label}
+              disabled={saving !== null}
+              onPress={() => handleSelect(option.value)}
+              style={({ pressed }) => [
+                styles.option,
+                pressed && styles.optionPressed,
+                saving === option.value && styles.optionSaving,
+              ]}>
+              <Text style={styles.icon}>{option.icon}</Text>
+              <Text style={styles.optionLabel}>{option.label}</Text>
               <Text style={styles.chevron}>›</Text>
             </Pressable>
           ))}
@@ -143,6 +156,10 @@ const styles = StyleSheet.create({
   optionPressed: {
     opacity: 0.82,
     transform: [{ scale: 0.995 }],
+  },
+  optionSaving: {
+    borderColor: colors.gold,
+    backgroundColor: '#FFF8E9',
   },
   icon: {
     width: 36,

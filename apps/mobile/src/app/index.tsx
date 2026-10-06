@@ -1,11 +1,52 @@
+import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/emaus/primary-button';
+import { getActiveJourneySummary } from '@/data/repositories/journey-repository';
+import { getOnboardingDraft } from '@/data/repositories/onboarding-repository';
 import { colors, spacing, typeScale } from '@/design/tokens';
+import { getOnboardingResumeRoute } from '@/domain/onboarding';
 
 export default function WelcomeScreen() {
+  const db = useSQLiteContext();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    Promise.all([getActiveJourneySummary(db), getOnboardingDraft(db)])
+      .then(([journey, draft]) => {
+        if (!active) return;
+
+        if (journey) {
+          router.replace('/today');
+          return;
+        }
+
+        const resumeRoute = getOnboardingResumeRoute(draft?.currentStep ?? 0);
+        if (resumeRoute) {
+          router.replace(resumeRoute);
+          return;
+        }
+
+        setReady(true);
+      })
+      .catch(() => {
+        if (active) setReady(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [db]);
+
+  if (!ready) {
+    return <View style={styles.screen} />;
+  }
+
   return (
     <View style={styles.screen}>
       <View pointerEvents="none" style={styles.lightTop} />
