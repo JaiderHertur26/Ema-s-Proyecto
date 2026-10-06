@@ -311,7 +311,7 @@ Actualizado durante la construcción inicial:
 - 3.4 Modelo de dominio inicial — COMPLETADO
 - 3.5 Onboarding local de extremo a extremo — COMPLETADO EN PRIMERA VERSIÓN
 - 3.6 Pantalla HOY conectada al camino activo — BASE FUNCIONAL
-- 3.7 Motor de personalización — SIGUIENTE
+- 3.7 Motor de personalización — COMPLETADO EN PRIMERA VERSIÓN
 - 3.8 Orar — PENDIENTE
 - 3.9 Recuerdos — PENDIENTE
 - 3.10 Mi Camino — PENDIENTE
