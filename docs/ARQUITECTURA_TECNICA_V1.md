@@ -316,7 +316,7 @@ Actualizado durante la construcción inicial:
 - 3.9 Recuerdos — PENDIENTE
 - 3.10 Mi Camino — COMPLETADO EN PRIMERA VERSIÓN
 - 3.11 Rutas emocionales — COMPLETADO EN PRIMERA VERSIÓN
-- 3.12 Supabase Auth anónimo — PENDIENTE
+- 3.12 Supabase Auth anónimo — IMPLEMENTADO EN CÓDIGO · PENDIENTE PROYECTO CLOUD
 
 ### Persistencia actual
 
@@ -398,3 +398,47 @@ Incluido en la primera versión funcional:
 - EMAÚS declara explícitamente que no es un servicio de emergencia.
 
 La V1 todavía no muestra números telefónicos regionales automáticos; estos se incorporarán cuando exista configuración segura por país/región y red de apoyo del usuario.
+
+
+### FASE 3.12 — Supabase Auth anónimo
+
+Implementado en código:
+
+- Supabase JS integrado de manera opcional.
+- Uso exclusivo de URL de proyecto + clave publishable moderna.
+- Sin `service_role` ni claves secretas en el cliente.
+- Sesión almacenada de forma segura en chunks dentro de Expo SecureStore.
+- Creación de identidad con `signInAnonymously()` cuando exista configuración válida.
+- La app no se bloquea si Supabase no está configurado, no hay conexión o falla Auth.
+- Vinculación de `auth.users.id` con `profiles.remote_user_id`.
+- El ID remoto no puede cambiar silenciosamente.
+- Si existe `remote_user_id` pero se pierde la sesión anónima, se entra en `recovery_required` en lugar de crear otra identidad.
+- Si aparece una identidad distinta se entra en `identity_conflict`.
+- Auto-refresh de tokens según estado activo/inactivo de la app.
+- Estado visible en “Para mí”.
+- Archivo `.env.example`.
+- Documento `docs/SUPABASE_EMAUS_SETUP.md`.
+
+Pendiente para cerrar 3.12 contra nube real:
+
+- crear un proyecto Supabase exclusivo de EMAÚS;
+- habilitar Anonymous Sign-Ins;
+- obtener URL + clave publishable;
+- probar creación/reapertura de sesión anónima en dispositivo real;
+- verificar el mismo `auth.users.id` después de cerrar y volver a abrir la app.
+
+No se reutilizarán los proyectos de Contabilidad ni Registro Sacramental.
+
+
+### Nota de auditoría npm — Auth
+
+Después de integrar Supabase JS se ejecutó `npm audit --omit=dev --audit-level=high`.
+
+Resultado actual:
+- 30 avisos transitivos: 11 moderate y 19 high.
+- Los caminos reportados pasan principalmente por Expo/Metro/config-plugins y herramientas de build.
+- `npm audit fix --force` propone cambios incompatibles, incluyendo downgrade de Expo a 44 y cambios mayores en Expo Router.
+- No se aplica `--force`.
+- Se mantiene Expo Doctor 21/21 y se revisarán parches compatibles del SDK antes de beta/publicación.
+
+Regla: una advertencia de auditoría no se “corrige” rompiendo el árbol soportado por Expo. Se actualiza únicamente mediante versiones compatibles y validadas.
