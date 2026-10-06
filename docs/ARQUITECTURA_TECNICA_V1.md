@@ -314,7 +314,7 @@ Actualizado durante la construcción inicial:
 - 3.7 Motor de personalización — COMPLETADO EN PRIMERA VERSIÓN
 - 3.8 Orar — BASE FUNCIONAL: oración inmediata + registro privado
 - 3.9 Recuerdos — PENDIENTE
-- 3.10 Mi Camino — PENDIENTE
+- 3.10 Mi Camino — COMPLETADO EN PRIMERA VERSIÓN
 - 3.11 Rutas emocionales — PENDIENTE
 - 3.12 Supabase Auth anónimo — PENDIENTE
 
@@ -364,3 +364,19 @@ No incluido todavía:
 - Sincronización multimedia con la nube.
 
 Estas funciones no bloquean el MVP de Recuerdos y se mantienen en backlog.
+
+
+### FASE 3.10 — Mi Camino
+
+Incluido en la primera versión funcional:
+
+- Cálculo del momento actual cuando la fecha de partida es exacta.
+- Sin porcentajes ni concepto de “duelo completado”.
+- Si la fecha es desconocida, no se inventa una etapa.
+- Recorridos disponibles: Primeros días, Exequias, Nueve días, Primer mes, Meses siguientes, Fechas importantes, Primer aniversario y Después del primer año.
+- Exequias y Fechas importantes permanecen siempre disponibles porque no pueden deducirse honestamente solo por calendario.
+- Cada recorrido abre Palabra, reflexión, pequeño paso y oración.
+- Todos los recorridos pueden abrirse aunque no correspondan al momento calculado.
+- EMAÚS registra localmente que un contenido ya fue visitado y muestra “Ya recorriste este contenido. Puedes volver cuando quieras.”
+- Nueva migración SQLite V2: `journey_stage_visits`.
+- Prueba de actualización V1→V2 con conservación de datos: OK.

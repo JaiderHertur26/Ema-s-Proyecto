@@ -217,4 +217,22 @@ export const migrations: Migration[] = [
       );
     `,
   },
+  {
+    version: 2,
+    sql: `
+      CREATE TABLE IF NOT EXISTS journey_stage_visits (
+        id TEXT PRIMARY KEY NOT NULL,
+        owner_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        journey_id TEXT NOT NULL REFERENCES grief_journeys(id) ON DELETE CASCADE,
+        stage_id TEXT NOT NULL,
+        first_visited_at TEXT NOT NULL,
+        last_visited_at TEXT NOT NULL,
+        visit_count INTEGER NOT NULL DEFAULT 1 CHECK (visit_count >= 1),
+        UNIQUE (journey_id, stage_id)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_stage_visits_journey
+        ON journey_stage_visits(journey_id, last_visited_at DESC);
+    `,
+  },
 ];
