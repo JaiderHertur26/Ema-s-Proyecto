@@ -340,3 +340,27 @@ El usuario puede abandonar el onboarding y reanudarlo desde el último paso pers
 El árbol de Expo reporta avisos de `npm audit` en dependencias transitivas.
 No se ejecuta `npm audit fix --force` porque propone cambios incompatibles con la versión de Expo.
 Se revisará y actualizará mediante versiones compatibles del SDK, sin romper el árbol nativo.
+
+
+### FASE 3.9 — Recuerdos
+
+Incluido en la primera versión funcional:
+
+- Su historia: recuerdos de texto privados.
+- Lo que me enseñó: legado y aprendizajes.
+- Momentos que no quiero olvidar.
+- Cartas privadas.
+- Llevar una carta a la oración sin simular respuestas del fallecido.
+- Archivo y consulta de cartas.
+- Fotografías seleccionadas explícitamente por el usuario.
+- Copia de fotografías al almacenamiento privado de documentos de la app.
+- Metadatos de cartas, recuerdos y fotografías preparados para futura sincronización mediante `sync_outbox`.
+
+No incluido todavía:
+
+- Audios.
+- Fechas especiales dentro de Recuerdos.
+- Compartir recuerdos entre familiares.
+- Sincronización multimedia con la nube.
+
+Estas funciones no bloquean el MVP de Recuerdos y se mantienen en backlog.
