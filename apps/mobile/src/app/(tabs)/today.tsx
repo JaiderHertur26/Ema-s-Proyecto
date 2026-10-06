@@ -190,7 +190,10 @@ export default function TodayScreen() {
           <Text style={styles.cardText}>{copy.prayer}</Text>
         </View>
 
-        <Pressable accessibilityRole="button" style={styles.difficultButton}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/difficult-moment')}
+          style={styles.difficultButton}>
           <Text style={styles.difficultText}>Hoy me está costando mucho</Text>
         </Pressable>
       </ScrollView>

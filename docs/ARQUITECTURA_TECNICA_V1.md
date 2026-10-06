@@ -315,7 +315,7 @@ Actualizado durante la construcción inicial:
 - 3.8 Orar — BASE FUNCIONAL: oración inmediata + registro privado
 - 3.9 Recuerdos — PENDIENTE
 - 3.10 Mi Camino — COMPLETADO EN PRIMERA VERSIÓN
-- 3.11 Rutas emocionales — PENDIENTE
+- 3.11 Rutas emocionales — COMPLETADO EN PRIMERA VERSIÓN
 - 3.12 Supabase Auth anónimo — PENDIENTE
 
 ### Persistencia actual
@@ -380,3 +380,21 @@ Incluido en la primera versión funcional:
 - EMAÚS registra localmente que un contenido ya fue visitado y muestra “Ya recorriste este contenido. Puedes volver cuando quieras.”
 - Nueva migración SQLite V2: `journey_stage_visits`.
 - Prueba de actualización V1→V2 con conservación de datos: OK.
+
+
+### FASE 3.11 — Rutas emocionales
+
+Incluido en la primera versión funcional:
+
+- Acceso real desde “Hoy me está costando mucho”.
+- Rutas: llanto intenso, ansiedad, culpa, rabia, soledad, insomnio, miedo, recuerdo inesperado, necesidad de Dios, necesidad de hablar y “no sé qué siento”.
+- Intensidad humana: suave, moderado, muy fuerte o “no sé”.
+- Los estados que corresponden se registran como check-ins emocionales reales en SQLite.
+- Las rutas intensas priorizan regulación breve y sugieren compañía humana.
+- Ruta específica de apoyo humano.
+- Entrada explícita de seguridad para personas que temen hacerse daño o no pueden mantenerse seguras.
+- En seguridad, la app prioriza: no permanecer solo, avisar claramente a una persona, reducir acceso a medios de daño cuando sea seguro y contactar servicios de emergencia/crisis de la región.
+- La oración aparece solo como complemento y nunca sustituye ayuda urgente.
+- EMAÚS declara explícitamente que no es un servicio de emergencia.
+
+La V1 todavía no muestra números telefónicos regionales automáticos; estos se incorporarán cuando exista configuración segura por país/región y red de apoyo del usuario.
