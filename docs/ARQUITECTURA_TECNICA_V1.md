@@ -316,7 +316,7 @@ Actualizado durante la construcción inicial:
 - 3.9 Recuerdos — PENDIENTE
 - 3.10 Mi Camino — COMPLETADO EN PRIMERA VERSIÓN
 - 3.11 Rutas emocionales — COMPLETADO EN PRIMERA VERSIÓN
-- 3.12 Supabase Auth anónimo — IMPLEMENTADO EN CÓDIGO · PENDIENTE PROYECTO CLOUD
+- 3.12 Supabase Auth anónimo — COMPLETADO
 
 ### Persistencia actual
 
@@ -442,3 +442,30 @@ Resultado actual:
 - Se mantiene Expo Doctor 21/21 y se revisarán parches compatibles del SDK antes de beta/publicación.
 
 Regla: una advertencia de auditoría no se “corrige” rompiendo el árbol soportado por Expo. Se actualiza únicamente mediante versiones compatibles y validadas.
+
+
+### Cierre FASE 3.12 — Validación cloud real
+
+Proyecto Supabase EMAÚS:
+- Project ref: `xxcxmzawxsgmcdzzrcsh`
+- URL real configurada mediante `.env.local`
+- Publishable key real configurada localmente y excluida de Git
+
+Pruebas reales completadas:
+- proyecto accesible con publishable key: OK
+- Anonymous Sign-Ins habilitado: OK
+- `signInAnonymously()`: OK
+- usuario recibido con `is_anonymous = true`: OK
+- sesión restaurada mediante almacenamiento persistente de prueba: OK
+- mismo `auth.users.id` después de recrear el cliente: OK
+- `auth.getUser()` validó la identidad contra el servidor: OK
+- Expo Doctor con configuración cloud real: 21/21
+- lint y TypeScript: OK
+
+Limitación de esta sesión:
+- `adb` no está disponible en PATH, por lo que la prueba física de SecureStore tras matar/reabrir un build Android se realizará cuando se instale el development build.
+- Esta limitación no bloquea el cierre de la capa de Auth ni la siguiente fase de sincronización.
+
+Antes de beta pública:
+- activar Captcha/Turnstile para reducir abuso de cuentas anónimas;
+- revisar rate limits de Auth.

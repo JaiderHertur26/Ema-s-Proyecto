@@ -147,3 +147,19 @@ La prueba exige:
 - sesión restaurada en un segundo cliente;
 - mismo `auth.users.id`;
 - `is_anonymous = true`.
+
+
+## Anonymous Auth — verificación completada
+
+Después de habilitar Anonymous Sign-Ins se ejecutó `scripts/verify-anonymous-auth.mjs`.
+
+Resultado:
+- `OK_ANONYMOUS_SIGN_IN: true`
+- `OK_SESSION_RESTORE: true`
+- `OK_SAME_REMOTE_USER: true`
+- `IS_ANONYMOUS: true`
+- `auth.getUser()` confirmó el mismo usuario con el servidor.
+
+El UUID concreto generado por la prueba no se documenta porque es un dato operativo temporal.
+
+FASE 3.12: COMPLETADA.
