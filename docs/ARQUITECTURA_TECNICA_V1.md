@@ -537,3 +537,30 @@ Regla de activación:
 No cambiar `EXPO_PUBLIC_SUPABASE_SYNC_ENABLED=true` hasta que:
 1. la migración remota haya sido aplicada;
 2. `scripts/verify-sync-rls.mjs` devuelva `RLS_ISOLATION: PASS`.
+
+
+### CIERRE FASE 3.13 — Sincronización real con Supabase
+
+Estado final: COMPLETADA.
+
+Validaciones remotas ejecutadas sobre el proyecto EMAÚS:
+
+- Migración PostgreSQL aplicada correctamente.
+- `RLS_ISOLATION: PASS`.
+- Usuario A puede leer sus propios datos.
+- Usuario B no puede leer datos de A.
+- Usuario B no puede modificar datos de A.
+- Usuario B no puede enlazar registros propios a datos de A.
+- `SYNC_SCHEMA_ROUNDTRIP: PASS`.
+- `loved_ones`: OK.
+- `grief_journeys`: OK.
+- `emotional_checkins`: OK.
+- `memories`: OK.
+- `letters`: OK.
+- `prayer_logs`: OK.
+- `server_updated_at`: OK.
+- borrado en cascada: OK.
+- `EXPO_PUBLIC_SUPABASE_SYNC_ENABLED=true` activado localmente después de pasar ambas pruebas.
+- SQLite V3, ESLint, TypeScript, Expo Doctor 21/21 y export Android: OK.
+
+La FASE 3.14 continúa con Storage privado para fotografías. Hasta ese punto, las fotografías solo sincronizan metadatos y nunca una URI privada local.
