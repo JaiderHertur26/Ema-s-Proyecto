@@ -296,4 +296,23 @@ export const migrations: Migration[] = [
         CHECK (protect_screen_capture IN (0, 1));
     `,
   },
+  {
+    version: 6,
+    sql: `
+      ALTER TABLE user_preferences
+        ADD COLUMN daily_notification_hour INTEGER NOT NULL DEFAULT 8
+        CHECK (daily_notification_hour BETWEEN 0 AND 23);
+
+      ALTER TABLE user_preferences
+        ADD COLUMN daily_notification_minute INTEGER NOT NULL DEFAULT 0
+        CHECK (daily_notification_minute BETWEEN 0 AND 59);
+
+      ALTER TABLE user_preferences
+        ADD COLUMN notification_show_loved_one_name INTEGER NOT NULL DEFAULT 0
+        CHECK (notification_show_loved_one_name IN (0, 1));
+
+      UPDATE user_preferences
+         SET special_date_notifications = 0;
+    `,
+  },
 ];

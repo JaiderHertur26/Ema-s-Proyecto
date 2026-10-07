@@ -677,3 +677,39 @@ Pendiente de prueba física, trasladado a FASE 3.17/3.18:
 Pendiente obligatorio antes de beta:
 - Captcha/Turnstile para Anonymous Auth.
 - revisión de rate limits de Supabase.
+
+
+### CIERRE FASE 3.16 — Notificaciones
+
+Estado: COMPLETADA EN CÓDIGO.
+
+Implementado:
+
+- `expo-notifications` compatible con SDK 57.
+- Notificaciones locales; no push remoto en V1.
+- Permiso solicitado únicamente por acción explícita.
+- Recordatorio diario opt-in.
+- Fechas importantes opt-in.
+- Hora editable por el usuario.
+- Nombre del ser querido oculto por defecto.
+- Canal Android discreto: sin sonido, sin vibración, sin badge y visibilidad SECRET en lockscreen.
+- Nueve días y primer mes solo si la fecha exacta existe y el momento aún no pasó.
+- Aniversario y cumpleaños mediante trigger anual nativo.
+- Fechas manuales futuras desde `special_dates`.
+- Reconstrucción silenciosa del calendario al abrir la app si ya existe permiso.
+- Prueba manual de notificación.
+- Pantalla funcional desde “Para mí → Notificaciones”.
+- SQLite V6 con defaults de consentimiento explícito.
+- Instalaciones nuevas y upgrades existentes quedan con daily/special desactivados.
+
+Validaciones:
+
+- SQLite: 6 migraciones · upgrade V1→V6 OK.
+- ESLint: OK.
+- TypeScript: OK.
+- Expo Config: OK.
+- Expo Doctor: 21/21.
+- `expo install --check`: OK.
+- Export Android: OK.
+
+La prueba física de entrega y permisos se realiza en FASE 3.17 Android y FASE 3.18 iOS.

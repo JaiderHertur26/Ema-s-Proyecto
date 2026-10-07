@@ -161,13 +161,20 @@ export default function MeScreen() {
         <View style={styles.list}>
           {rows.map(([icon, title, subtitle]) => {
             const isSecurity = title === 'Privacidad y seguridad';
+            const isNotifications = title === 'Notificaciones';
 
-            if (isSecurity) {
+            if (isSecurity || isNotifications) {
               return (
                 <Pressable
                   key={title}
                   accessibilityRole="button"
-                  onPress={() => router.push('/settings/security')}
+                  onPress={() =>
+                    router.push(
+                      isSecurity
+                        ? '/settings/security'
+                        : '/settings/notifications'
+                    )
+                  }
                   style={({ pressed }) => [
                     styles.row,
                     pressed && styles.pressed,

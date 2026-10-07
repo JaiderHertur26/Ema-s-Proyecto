@@ -54,6 +54,7 @@
           "faceIDPermission": "Permite a EMAÚS usar Face ID para proteger tus recuerdos y datos privados."
         }
       ],
+      "expo-notifications",
       "@react-native-community/datetimepicker",
       [
         "expo-image-picker",

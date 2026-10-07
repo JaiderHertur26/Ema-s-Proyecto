@@ -43,7 +43,12 @@ async function ensureLocalProfile(db: SQLiteDatabase) {
   );
 
   await db.runAsync(
-    `INSERT INTO user_preferences (owner_id, updated_at) VALUES (?, ?)`,
+    `INSERT INTO user_preferences (
+       owner_id,
+       daily_notifications,
+       special_date_notifications,
+       updated_at
+     ) VALUES (?, 0, 0, ?)`,
     id,
     now
   );

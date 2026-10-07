@@ -89,8 +89,20 @@ if missing_memory_columns:
     )
 
 preference_columns = table_columns(db, "user_preferences")
-if "protect_screen_capture" not in preference_columns:
-    raise SystemExit("Missing user_preferences.protect_screen_capture")
+required_preference_columns = {
+    "protect_screen_capture",
+    "daily_notification_hour",
+    "daily_notification_minute",
+    "notification_show_loved_one_name",
+}
+missing_preference_columns = sorted(
+    required_preference_columns.difference(preference_columns)
+)
+if missing_preference_columns:
+    raise SystemExit(
+        f"Missing user_preferences security/notification columns: "
+        f"{missing_preference_columns}"
+    )
 
 draft = db.execute(
     "SELECT id, current_step FROM onboarding_draft WHERE id = 'current'"
@@ -141,6 +153,17 @@ upgrade.execute(
     ) VALUES (
       'outbox-test', 'profile-test', 'loved_ones', 'loved-test', 'insert',
       '{}', '2026-01-01', '2026-01-01'
+    )
+    """
+)
+upgrade.execute(
+    """
+    INSERT INTO user_preferences (
+      owner_id,
+      updated_at
+    ) VALUES (
+      'profile-test',
+      '2026-01-01'
     )
     """
 )
@@ -203,9 +226,26 @@ if not required_memory_columns.issubset(upgrade_memory_columns):
     raise SystemExit("Upgrade V1 -> latest did not add all memories media columns.")
 
 upgrade_preference_columns = table_columns(upgrade, "user_preferences")
-if "protect_screen_capture" not in upgrade_preference_columns:
+if not required_preference_columns.issubset(upgrade_preference_columns):
     raise SystemExit(
-        "Upgrade V1 -> latest did not add protect_screen_capture."
+        "Upgrade V1 -> latest did not add all security/notification preferences."
+    )
+
+notification_defaults = upgrade.execute(
+    """
+    SELECT
+      daily_notifications,
+      special_date_notifications,
+      daily_notification_hour,
+      daily_notification_minute,
+      notification_show_loved_one_name
+    FROM user_preferences
+    WHERE owner_id = 'profile-test'
+    """
+).fetchone()
+if notification_defaults != (0, 0, 8, 0, 0):
+    raise SystemExit(
+        f"Unexpected notification defaults after upgrade: {notification_defaults}"
     )
 
 print(
