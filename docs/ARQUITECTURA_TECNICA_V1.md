@@ -501,3 +501,39 @@ Validaciones locales de este checkpoint:
 - TypeScript: OK;
 - Expo Doctor: 21/21;
 - export Android: OK.
+
+
+### FASE 3.13 — Sincronización real con Supabase · checkpoint previo a RLS
+
+Implementado en código:
+
+- Migración remota PostgreSQL exclusiva de EMAÚS.
+- Tablas remotas con `user_id = auth.uid()`.
+- RLS habilitado para todas las tablas personales.
+- Foreign keys compuestas `(id, user_id)` para impedir referencias cruzadas entre usuarios.
+- Trigger de creación automática de `profiles` desde `auth.users`.
+- Backfill de perfiles para usuarios Auth existentes.
+- `server_updated_at` controlado por servidor.
+- Motor local de `sync_outbox`.
+- Push primero y pull después.
+- Sincronización actual: loved_ones, grief_journeys, emotional_checkins, memories, letters y prayer_logs.
+- Fotografías: solo metadatos; nunca se sube una URI privada local del dispositivo.
+- Tabla local `sync_runtime_state` con último intento, último éxito, error y pendientes.
+- Tabla local `sync_conflicts` para preservar ambos lados antes de resolver un conflicto.
+- UI en “Para mí” con estado real del respaldo.
+- Botón manual “Sincronizar ahora” cuando la sincronización esté habilitada.
+- Bandera `EXPO_PUBLIC_SUPABASE_SYNC_ENABLED=false` como seguro de activación.
+- Prueba automatizada RLS con dos usuarios anónimos distintos.
+- La prueba RLS actualmente confirma que el esquema remoto aún no está aplicado.
+
+Validaciones locales:
+- SQLite: 3 migraciones · 18 tablas · 9 índices · upgrade V1→V3 OK.
+- ESLint: OK.
+- TypeScript: OK.
+- Expo Doctor: 21/21.
+- Export Android: OK.
+
+Regla de activación:
+No cambiar `EXPO_PUBLIC_SUPABASE_SYNC_ENABLED=true` hasta que:
+1. la migración remota haya sido aplicada;
+2. `scripts/verify-sync-rls.mjs` devuelva `RLS_ISOLATION: PASS`.
