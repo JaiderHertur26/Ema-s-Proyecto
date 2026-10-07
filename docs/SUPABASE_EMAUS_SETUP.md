@@ -105,3 +105,45 @@ FASE 3.13 implementará:
 - pruebas offline → online
 
 La sincronización no se activa hasta que exista el proyecto Supabase EMAÚS y hayan sido auditadas sus políticas RLS.
+
+
+## Proyecto cloud creado
+
+Proyecto EMAÚS:
+- Project ref: `xxcxmzawxsgmcdzzrcsh`
+- URL: `https://xxcxmzawxsgmcdzzrcsh.supabase.co`
+- Cuenta propietaria indicada por el usuario: `caminoemaus26@gmail.com`
+
+Estado de conexión:
+- URL configurada localmente.
+- Publishable key pendiente de cargar en `.env.local`.
+- El conector/CLI disponible en esta sesión sigue autenticado con otra cuenta y no tiene permiso sobre este proyecto.
+- La sesión CLI temporal para EMAÚS está excluida de Git.
+
+
+## Verificación real del proyecto
+
+Verificación efectuada con la URL y publishable key reales:
+
+- Proyecto accesible: OK.
+- Publishable key válida: OK.
+- Signups generales deshabilitados: NO.
+- `signInAnonymously()`: BLOQUEADO por configuración.
+- Respuesta de Supabase: `Anonymous sign-ins are disabled`.
+
+Acción pendiente en Dashboard:
+Authentication → Providers → Anonymous → habilitar Anonymous Sign-Ins.
+
+Después de habilitarlo, ejecutar:
+
+```cmd
+cd /d "D:\Proyecto EMAÚS\apps\mobile"
+node scripts\verify-anonymous-auth.mjs
+```
+
+La prueba exige:
+- usuario anónimo creado;
+- sesión creada;
+- sesión restaurada en un segundo cliente;
+- mismo `auth.users.id`;
+- `is_anonymous = true`.

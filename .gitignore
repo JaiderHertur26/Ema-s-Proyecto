@@ -9,6 +9,7 @@
 **/.env
 **/.env.*
 !**/.env.example
+.supabase-emaus-home/
 
 # OS / editors
 .DS_Store
