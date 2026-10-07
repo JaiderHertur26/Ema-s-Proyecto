@@ -11,6 +11,8 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.caminoemaus.emaus",
+      "versionCode": 1,
       "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#F8F2E7",
