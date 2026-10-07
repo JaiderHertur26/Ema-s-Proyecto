@@ -68,6 +68,30 @@ missing = sorted(required_tables.difference(tables))
 if missing:
     raise SystemExit(f"Missing required tables: {missing}")
 
+
+def table_columns(connection: sqlite3.Connection, table: str) -> set[str]:
+    return {
+        row[1]
+        for row in connection.execute(f"PRAGMA table_info({table})")
+    }
+
+
+memory_columns = table_columns(db, "memories")
+required_memory_columns = {
+    "media_object_path",
+    "media_mime_type",
+    "media_size_bytes",
+}
+missing_memory_columns = sorted(required_memory_columns.difference(memory_columns))
+if missing_memory_columns:
+    raise SystemExit(
+        f"Missing memories security/storage columns: {missing_memory_columns}"
+    )
+
+preference_columns = table_columns(db, "user_preferences")
+if "protect_screen_capture" not in preference_columns:
+    raise SystemExit("Missing user_preferences.protect_screen_capture")
+
 draft = db.execute(
     "SELECT id, current_step FROM onboarding_draft WHERE id = 'current'"
 ).fetchone()
@@ -173,6 +197,16 @@ if visit != ("first_days", 1):
     raise SystemExit(f"Unexpected stage visit after upgrade: {visit}")
 if conflict != ("loved-test",):
     raise SystemExit(f"Unexpected conflict row after upgrade: {conflict}")
+
+upgrade_memory_columns = table_columns(upgrade, "memories")
+if not required_memory_columns.issubset(upgrade_memory_columns):
+    raise SystemExit("Upgrade V1 -> latest did not add all memories media columns.")
+
+upgrade_preference_columns = table_columns(upgrade, "user_preferences")
+if "protect_screen_capture" not in upgrade_preference_columns:
+    raise SystemExit(
+        "Upgrade V1 -> latest did not add protect_screen_capture."
+    )
 
 print(
     f"OK migrations={len(scripts)} tables={len(tables)} indexes={len(indexes)} "

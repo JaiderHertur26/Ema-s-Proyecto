@@ -23,7 +23,7 @@ export async function getOrCreateDatabaseKey(): Promise<string | null> {
   const generated = bytesToHex(bytes);
 
   await SecureStore.setItemAsync(STORAGE_KEY, generated, {
-    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
   });
 
   return generated;

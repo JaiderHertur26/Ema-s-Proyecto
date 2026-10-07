@@ -11,6 +11,7 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#F8F2E7",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -45,6 +46,12 @@
         {
           "configureAndroidBackup": true,
           "faceIDPermission": "Permite a EMAÚS proteger tus recuerdos y datos privados con Face ID."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Permite a EMAÚS usar Face ID para proteger tus recuerdos y datos privados."
         }
       ],
       "@react-native-community/datetimepicker",

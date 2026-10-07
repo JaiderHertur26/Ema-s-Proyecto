@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -158,15 +159,39 @@ export default function MeScreen() {
         </View>
 
         <View style={styles.list}>
-          {rows.map(([icon, title, subtitle]) => (
-            <View key={title} style={styles.row}>
-              <Text style={styles.icon}>{icon}</Text>
-              <View style={styles.copy}>
-                <Text style={styles.rowTitle}>{title}</Text>
-                <Text style={styles.rowSubtitle}>{subtitle}</Text>
+          {rows.map(([icon, title, subtitle]) => {
+            const isSecurity = title === 'Privacidad y seguridad';
+
+            if (isSecurity) {
+              return (
+                <Pressable
+                  key={title}
+                  accessibilityRole="button"
+                  onPress={() => router.push('/settings/security')}
+                  style={({ pressed }) => [
+                    styles.row,
+                    pressed && styles.pressed,
+                  ]}>
+                  <Text style={styles.icon}>{icon}</Text>
+                  <View style={styles.copy}>
+                    <Text style={styles.rowTitle}>{title}</Text>
+                    <Text style={styles.rowSubtitle}>{subtitle}</Text>
+                  </View>
+                  <Text style={styles.chevron}>›</Text>
+                </Pressable>
+              );
+            }
+
+            return (
+              <View key={title} style={styles.row}>
+                <Text style={styles.icon}>{icon}</Text>
+                <View style={styles.copy}>
+                  <Text style={styles.rowTitle}>{title}</Text>
+                  <Text style={styles.rowSubtitle}>{subtitle}</Text>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -309,6 +334,7 @@ const styles = StyleSheet.create({
   },
   icon: { width: 30, color: colors.navy, fontSize: 21, textAlign: 'center' },
   copy: { flex: 1 },
+  chevron: { color: colors.navy, fontSize: 24 },
   rowTitle: { color: colors.ink, fontSize: typeScale.bodySmall, fontWeight: '700' },
   rowSubtitle: { color: colors.inkSoft, fontSize: typeScale.caption, marginTop: 3 },
 });

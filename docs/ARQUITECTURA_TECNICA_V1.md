@@ -612,3 +612,68 @@ Validaciones finales:
 
 Nota:
 La eliminación funcional de recuerdos todavía no existe en la UI. Cuando se implemente, deberá eliminar también su objeto de Storage para evitar archivos huérfanos.
+
+
+### CIERRE FASE 3.15 — Seguridad
+
+Estado: COMPLETADA EN CÓDIGO Y CLOUD.
+
+Controles implementados:
+
+- SQLCipher habilitado para builds nativos.
+- Clave SQLite aleatoria de 256 bits en SecureStore.
+- Clave SQLite marcada `AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY`.
+- Sesión Supabase en SecureStore y ligada a este dispositivo.
+- Android Auto Backup desactivado.
+- Bloqueo opcional de EMAÚS con autenticación local.
+- Activar o desactivar el bloqueo exige autenticación del dispositivo.
+- Rebloqueo al pasar a background.
+- Protección opcional contra capturas/grabación.
+- Protección del app switcher en iOS cuando corresponde.
+- Gate de seguridad antes de mostrar las pantallas de la app.
+- Pantalla funcional “Privacidad y seguridad” desde “Para mí”.
+- Preferencias de seguridad son locales al dispositivo y no se sincronizan.
+
+Pruebas de seguridad cloud:
+
+- `RLS_ISOLATION: PASS`.
+- `STORAGE_RLS_ISOLATION: PASS`.
+- `UNAUTHENTICATED_ACCESS: DENIED`.
+- Cliente con publishable key y sin sesión no puede leer ni escribir datos personales.
+- Cliente sin sesión no puede descargar Storage privado.
+- URL pública directa del bucket privado bloqueada.
+
+Auditoría de repositorio:
+
+- `.env.local` fuera de Git.
+- No hay secretos administrativos reales versionados.
+- No hay `service_role`, `sb_secret_`, claves privadas ni cadenas PostgreSQL reales.
+- No hay logging de consola en `apps/mobile/src`.
+
+Validación técnica:
+
+- SQLite V5: upgrade V1→V5 sin pérdida de datos.
+- Expo Config: OK.
+- Expo Doctor: 21/21.
+- `expo install --check`: dependencias alineadas.
+- ESLint: OK.
+- TypeScript: OK.
+- Export Android: OK.
+
+Auditoría npm:
+- 30 avisos transitivos: 11 moderate y 19 high.
+- `npm audit fix --force` propone cambios incompatibles, incluido downgrade de Expo.
+- No se fuerza una “corrección” que rompa el árbol soportado.
+
+Pendiente de prueba física, trasladado a FASE 3.17/3.18:
+- SQLCipher real en development/release build.
+- persistencia SecureStore después de matar/reabrir.
+- biometría y fallback del dispositivo.
+- rebloqueo background→foreground.
+- bloqueo de screenshots/grabación.
+- privacidad del app switcher.
+- verificación final de Android backup desactivado en manifest generado.
+
+Pendiente obligatorio antes de beta:
+- Captcha/Turnstile para Anonymous Auth.
+- revisión de rate limits de Supabase.
