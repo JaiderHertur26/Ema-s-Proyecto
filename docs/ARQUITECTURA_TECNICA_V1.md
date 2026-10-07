@@ -564,3 +564,51 @@ Validaciones remotas ejecutadas sobre el proyecto EMAÚS:
 - SQLite V3, ESLint, TypeScript, Expo Doctor 21/21 y export Android: OK.
 
 La FASE 3.14 continúa con Storage privado para fotografías. Hasta ese punto, las fotografías solo sincronizan metadatos y nunca una URI privada local.
+
+
+### CIERRE FASE 3.14 — Storage privado de fotografías
+
+Estado final: COMPLETADA.
+
+Implementación:
+
+- Bucket privado `emaus-private`.
+- Límite de archivo: 15 MB.
+- MIME permitidos: JPEG, PNG, WebP, HEIC y HEIF.
+- Ningún objeto tiene URL pública permanente.
+- Ruta remota obligatoria: `auth.uid()/memories/<memoryId>/original.<ext>`.
+- RLS de Storage para SELECT, INSERT, UPDATE y DELETE.
+- El primer segmento de la ruta debe coincidir con `auth.uid()`.
+- SQLite V4 agrega `media_object_path`, `media_mime_type` y `media_size_bytes`.
+- La URI privada local nunca se envía a Supabase.
+- El motor de sync sube primero el archivo y después guarda `media_object_path` en `public.memories`.
+- Otro dispositivo descarga el objeto autenticado y crea una nueva copia dentro del almacenamiento privado local de EMAÚS.
+- El proceso de respaldo del archivo no altera artificialmente `updated_at` del recuerdo.
+- Las URLs firmadas solo se usan temporalmente cuando sean necesarias; no se almacenan.
+
+Pruebas remotas:
+
+- `STORAGE_RLS_ISOLATION: PASS`.
+- A puede subir su propio archivo: OK.
+- A puede descargar su propio archivo: OK.
+- B no puede descargar archivos de A: OK.
+- B no puede escribir dentro de la carpeta de A: OK.
+- B no puede listar la carpeta de A: OK.
+- URL pública directa bloqueada: OK.
+- URL firmada temporal autenticada: OK.
+- `PHOTO_MEMORY_ROUNDTRIP: PASS`.
+- fila `memories` + `media_object_path`: OK.
+- MIME y tamaño preservados: OK.
+- descarga privada: OK.
+- bytes descargados idénticos al archivo subido: OK.
+
+Validaciones finales:
+
+- SQLite: 4 migraciones · 18 tablas · 10 índices · upgrade V1→V4 OK.
+- ESLint: OK.
+- TypeScript: OK.
+- Expo Doctor: 21/21.
+- Export Android: OK.
+
+Nota:
+La eliminación funcional de recuerdos todavía no existe en la UI. Cuando se implemente, deberá eliminar también su objeto de Storage para evitar archivos huérfanos.
