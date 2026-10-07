@@ -20,6 +20,9 @@ export type MemoryRecord = {
   title: string | null;
   content: string | null;
   mediaUri: string | null;
+  mediaObjectPath: string | null;
+  mediaMimeType: string | null;
+  mediaSizeBytes: number | null;
   memoryDate: string | null;
   category: MemoryCategory | null;
   createdAt: string;
@@ -33,6 +36,9 @@ type MemoryRow = {
   title: string | null;
   content: string | null;
   media_uri: string | null;
+  media_object_path: string | null;
+  media_mime_type: string | null;
+  media_size_bytes: number | null;
   memory_date: string | null;
   category: MemoryCategory | null;
   created_at: string;
@@ -47,6 +53,9 @@ function mapMemory(row: MemoryRow): MemoryRecord {
     title: row.title,
     content: row.content,
     mediaUri: row.media_uri,
+    mediaObjectPath: row.media_object_path,
+    mediaMimeType: row.media_mime_type,
+    mediaSizeBytes: row.media_size_bytes,
     memoryDate: row.memory_date,
     category: row.category,
     createdAt: row.created_at,
@@ -118,6 +127,7 @@ export async function listMemories(
   const rows = await db.getAllAsync<MemoryRow>(
     `SELECT
        id, loved_one_id, type, title, content, media_uri,
+       media_object_path, media_mime_type, media_size_bytes,
        memory_date, category, created_at, updated_at
      FROM memories
      WHERE loved_one_id = ?
@@ -137,6 +147,7 @@ export async function listMemoriesByCategory(
   const rows = await db.getAllAsync<MemoryRow>(
     `SELECT
        id, loved_one_id, type, title, content, media_uri,
+       media_object_path, media_mime_type, media_size_bytes,
        memory_date, category, created_at, updated_at
      FROM memories
      WHERE loved_one_id = ?
@@ -156,6 +167,8 @@ export async function createPhotoMemory(
   input: {
     lovedOneId: string;
     mediaUri: string;
+    mediaMimeType?: string | null;
+    mediaSizeBytes?: number | null;
     title?: string | null;
     note?: string | null;
   }
@@ -174,14 +187,17 @@ export async function createPhotoMemory(
     await txn.runAsync(
       `INSERT INTO memories (
         id, owner_id, loved_one_id, type, title, content,
-        media_uri, category, created_at, updated_at
-      ) VALUES (?, ?, ?, 'photo', ?, ?, ?, 'photo', ?, ?)`,
+        media_uri, media_mime_type, media_size_bytes,
+        category, created_at, updated_at
+      ) VALUES (?, ?, ?, 'photo', ?, ?, ?, ?, ?, 'photo', ?, ?)`,
       id,
       profile.id,
       input.lovedOneId,
       title,
       note,
       input.mediaUri,
+      input.mediaMimeType ?? null,
+      input.mediaSizeBytes ?? null,
       now,
       now
     );
@@ -193,6 +209,8 @@ export async function createPhotoMemory(
       title,
       content: note,
       mediaUri: input.mediaUri,
+      mediaMimeType: input.mediaMimeType ?? null,
+      mediaSizeBytes: input.mediaSizeBytes ?? null,
       category: 'photo',
       createdAt: now,
       updatedAt: now,
@@ -200,4 +218,54 @@ export async function createPhotoMemory(
   });
 
   return id;
+}
+
+
+export async function getMemoryById(
+  db: SQLiteDatabase,
+  id: string
+): Promise<MemoryRecord | null> {
+  const row = await db.getFirstAsync<MemoryRow>(
+    `SELECT
+       id, loved_one_id, type, title, content, media_uri,
+       media_object_path, media_mime_type, media_size_bytes,
+       memory_date, category, created_at, updated_at
+     FROM memories
+     WHERE id = ? AND deleted_at IS NULL`,
+    id
+  );
+
+  return row ? mapMemory(row) : null;
+}
+
+export async function updateMemoryMediaRemotePath(
+  db: SQLiteDatabase,
+  id: string,
+  mediaObjectPath: string,
+  mediaMimeType: string | null,
+  mediaSizeBytes: number | null
+) {
+  await db.runAsync(
+    `UPDATE memories
+        SET media_object_path = ?,
+            media_mime_type = COALESCE(media_mime_type, ?),
+            media_size_bytes = COALESCE(media_size_bytes, ?)
+      WHERE id = ?`,
+    mediaObjectPath,
+    mediaMimeType,
+    mediaSizeBytes,
+    id
+  );
+}
+
+export async function updateMemoryLocalMediaUri(
+  db: SQLiteDatabase,
+  id: string,
+  mediaUri: string
+) {
+  await db.runAsync(
+    'UPDATE memories SET media_uri = ? WHERE id = ?',
+    mediaUri,
+    id
+  );
 }

@@ -275,4 +275,17 @@ export const migrations: Migration[] = [
         ON sync_conflicts(entity_table, entity_id, detected_at DESC);
     `,
   },
+  {
+    version: 4,
+    sql: `
+      ALTER TABLE memories ADD COLUMN media_object_path TEXT;
+      ALTER TABLE memories ADD COLUMN media_mime_type TEXT;
+      ALTER TABLE memories ADD COLUMN media_size_bytes INTEGER
+        CHECK (media_size_bytes IS NULL OR media_size_bytes >= 0);
+
+      CREATE INDEX IF NOT EXISTS idx_memories_media_object_path
+        ON memories(media_object_path)
+        WHERE media_object_path IS NOT NULL;
+    `,
+  },
 ];

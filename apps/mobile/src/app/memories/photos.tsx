@@ -14,9 +14,12 @@ import {
   type MemoryRecord,
 } from '@/data/repositories/memory-repository';
 import { colors, radius, spacing, typeScale } from '@/design/tokens';
+import { useAuthIdentity } from '@/services/auth/auth-provider';
+import { ensureMemoryPhotoCached } from '@/services/media/cloud-photo-storage';
 
 export default function PhotosScreen() {
   const db = useSQLiteContext();
+  const auth = useAuthIdentity();
   const [journey, setJourney] = useState<ActiveJourneySummary | null>(null);
   const [photos, setPhotos] = useState<MemoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,9 +35,35 @@ export default function PhotosScreen() {
     }
 
     const result = await listMemoriesByCategory(db, currentJourney.lovedOneId, 'photo');
-    setPhotos(result);
+
+    const remoteUserId = auth.remoteUserId;
+
+    if (remoteUserId) {
+      const hydrated = await Promise.all(
+        result.map(async (photo) => {
+          if (photo.mediaUri || !photo.mediaObjectPath) return photo;
+
+          try {
+            const localUri = await ensureMemoryPhotoCached(
+              db,
+              photo,
+              remoteUserId
+            );
+
+            return localUri ? { ...photo, mediaUri: localUri } : photo;
+          } catch {
+            return photo;
+          }
+        })
+      );
+
+      setPhotos(hydrated);
+    } else {
+      setPhotos(result);
+    }
+
     setLoading(false);
-  }, [db]);
+  }, [auth.remoteUserId, db]);
 
   useFocusEffect(
     useCallback(() => {

@@ -28,6 +28,8 @@ export default function AddPhotoScreen() {
   const db = useSQLiteContext();
   const [journey, setJourney] = useState<ActiveJourneySummary | null>(null);
   const [selectedUri, setSelectedUri] = useState<string | null>(null);
+  const [selectedMimeType, setSelectedMimeType] = useState<string | null>(null);
+  const [selectedSizeBytes, setSelectedSizeBytes] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
@@ -56,7 +58,10 @@ export default function AddPhotoScreen() {
     });
 
     if (result.canceled || !result.assets[0]) return;
-    setSelectedUri(result.assets[0].uri);
+    const asset = result.assets[0];
+    setSelectedUri(asset.uri);
+    setSelectedMimeType(asset.mimeType ?? null);
+    setSelectedSizeBytes(asset.fileSize ?? null);
   }
 
   async function savePhoto() {
@@ -68,6 +73,8 @@ export default function AddPhotoScreen() {
       await createPhotoMemory(db, {
         lovedOneId: journey.lovedOneId,
         mediaUri: privateUri,
+        mediaMimeType: selectedMimeType,
+        mediaSizeBytes: selectedSizeBytes,
         title,
         note,
       });

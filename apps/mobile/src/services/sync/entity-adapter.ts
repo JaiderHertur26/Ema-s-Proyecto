@@ -151,14 +151,18 @@ export async function buildRemoteEntity(
         type: string;
         title: string | null;
         content: string | null;
+        media_object_path: string | null;
+        media_mime_type: string | null;
+        media_size_bytes: number | null;
         memory_date: string | null;
         category: string | null;
         created_at: string;
         updated_at: string;
         deleted_at: string | null;
       }>(
-        `SELECT id, loved_one_id, type, title, content, memory_date,
-                category, created_at, updated_at, deleted_at
+        `SELECT id, loved_one_id, type, title, content,
+                media_object_path, media_mime_type, media_size_bytes,
+                memory_date, category, created_at, updated_at, deleted_at
            FROM memories WHERE id = ?`,
         entityId
       );
@@ -172,7 +176,9 @@ export async function buildRemoteEntity(
         type: row.type,
         title: row.title,
         content: row.content,
-        media_object_path: null,
+        media_object_path: row.media_object_path,
+        media_mime_type: row.media_mime_type,
+        media_size_bytes: row.media_size_bytes,
         memory_date: row.memory_date,
         category: row.category,
         created_at: row.created_at,
@@ -348,14 +354,18 @@ export async function applyRemoteEntity(
       await db.runAsync(
         `INSERT INTO memories (
            id, owner_id, loved_one_id, type, title, content,
-           media_uri, memory_date, category, created_at, updated_at, deleted_at
-         ) VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?)
+           media_uri, media_object_path, media_mime_type, media_size_bytes,
+           memory_date, category, created_at, updated_at, deleted_at
+         ) VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            loved_one_id = excluded.loved_one_id,
            type = excluded.type,
            title = excluded.title,
            content = excluded.content,
            media_uri = COALESCE(memories.media_uri, excluded.media_uri),
+           media_object_path = excluded.media_object_path,
+           media_mime_type = excluded.media_mime_type,
+           media_size_bytes = excluded.media_size_bytes,
            memory_date = excluded.memory_date,
            category = excluded.category,
            updated_at = excluded.updated_at,
@@ -366,6 +376,9 @@ export async function applyRemoteEntity(
         String(row.type),
         nullableString(row.title),
         nullableString(row.content),
+        nullableString(row.media_object_path),
+        nullableString(row.media_mime_type),
+        nullableNumber(row.media_size_bytes),
         nullableString(row.memory_date),
         nullableString(row.category),
         String(row.created_at),

@@ -18,6 +18,7 @@ import {
   upsertSyncMetadata,
 } from '@/data/repositories/sync-repository';
 import { getSupabaseClient } from '@/services/auth/supabase-client';
+import { uploadMemoryPhoto } from '@/services/media/cloud-photo-storage';
 
 import {
   applyRemoteEntity,
@@ -69,7 +70,7 @@ async function pushOutbox(
     const client = getSupabaseClient();
     if (!client) throw new Error('Supabase no está configurado.');
 
-    const localEntity = await buildRemoteEntity(
+    let localEntity = await buildRemoteEntity(
       db,
       item.entityTable,
       item.entityId,
@@ -120,6 +121,26 @@ async function pushOutbox(
         await removeOutboxItem(db, item.id);
         conflicts += 1;
         continue;
+      }
+    }
+
+    if (
+      item.entityTable === 'memories' &&
+      localEntity.type === 'photo' &&
+      !localEntity.deleted_at &&
+      !localEntity.media_object_path
+    ) {
+      await uploadMemoryPhoto(db, item.entityId, remoteUserId);
+
+      localEntity = await buildRemoteEntity(
+        db,
+        item.entityTable,
+        item.entityId,
+        remoteUserId
+      );
+
+      if (!localEntity) {
+        throw new Error('La fotografía dejó de estar disponible durante el respaldo.');
       }
     }
 
