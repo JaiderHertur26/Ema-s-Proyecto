@@ -61,6 +61,12 @@ export async function addEmotionalCheckin(
       context,
       createdAt: now,
     });
+
+    await enqueueSync(txn, journey.owner_id, 'grief_journeys', journeyId, 'update', {
+      id: journeyId,
+      lastCheckinAt: now,
+      updatedAt: now,
+    });
   });
 
   return id;

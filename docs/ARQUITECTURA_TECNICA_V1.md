@@ -469,3 +469,35 @@ Limitación de esta sesión:
 Antes de beta pública:
 - activar Captcha/Turnstile para reducir abuso de cuentas anónimas;
 - revisar rate limits de Auth.
+
+
+### FASE 3.13 — Sincronización real · checkpoint previo a RLS
+
+Implementado en código:
+
+- migración remota inicial en `supabase/migrations/20261006_001_emaus_sync_schema.sql`;
+- RLS por `auth.uid() = user_id`;
+- relaciones compuestas `(entity_id, user_id)` para impedir enlaces cruzados entre usuarios;
+- trigger de perfil para nuevos usuarios de Auth;
+- trigger servidor para `server_updated_at`;
+- sincronización inicial de: `loved_ones`, `grief_journeys`, `emotional_checkins`, `memories`, `letters`, `prayer_logs`;
+- push de `sync_outbox` antes del pull remoto;
+- detección de conflicto por `client_updated_at`;
+- preservación local de conflictos en `sync_conflicts`;
+- estado persistente de sync en `sync_runtime_state`;
+- pantalla “Para mí” preparada para mostrar pendientes, último éxito y error;
+- sincronización automática al volver la app a primer plano, solo cuando la bandera cloud esté habilitada;
+- fotografías: en esta fase solo sincronizan metadatos; nunca se envía la URI privada local del dispositivo.
+
+Protección de despliegue:
+
+- `EXPO_PUBLIC_SUPABASE_SYNC_ENABLED=false` hasta validar RLS;
+- prueba automatizada `scripts/verify-sync-rls.mjs` con dos usuarios anónimos;
+- la prueba exige que B no pueda leer, modificar ni enlazar datos de A.
+
+Validaciones locales de este checkpoint:
+- SQLite V3: 3 migraciones, 18 tablas, upgrade V1→V3 OK;
+- ESLint: OK;
+- TypeScript: OK;
+- Expo Doctor: 21/21;
+- export Android: OK.

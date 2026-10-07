@@ -235,4 +235,44 @@ export const migrations: Migration[] = [
         ON journey_stage_visits(journey_id, last_visited_at DESC);
     `,
   },
+  {
+    version: 3,
+    sql: `
+      CREATE TABLE IF NOT EXISTS sync_runtime_state (
+        id TEXT PRIMARY KEY NOT NULL CHECK (id = 'current'),
+        last_attempt_at TEXT,
+        last_success_at TEXT,
+        last_error TEXT,
+        pending_count INTEGER NOT NULL DEFAULT 0 CHECK (pending_count >= 0),
+        updated_at TEXT NOT NULL
+      );
+
+      INSERT OR IGNORE INTO sync_runtime_state (
+        id,
+        pending_count,
+        updated_at
+      ) VALUES (
+        'current',
+        0,
+        strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_sync_outbox_entity
+        ON sync_outbox(entity_table, entity_id, created_at);
+
+      CREATE TABLE IF NOT EXISTS sync_conflicts (
+        id TEXT PRIMARY KEY NOT NULL,
+        entity_table TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        local_payload_json TEXT NOT NULL,
+        remote_payload_json TEXT NOT NULL,
+        detected_at TEXT NOT NULL,
+        resolved_at TEXT,
+        resolution TEXT
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_sync_conflicts_entity
+        ON sync_conflicts(entity_table, entity_id, detected_at DESC);
+    `,
+  },
 ];

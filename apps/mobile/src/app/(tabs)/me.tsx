@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typeScale } from '@/design/tokens';
 import { useAuthIdentity } from '@/services/auth/auth-provider';
 import type { CloudIdentityStatus } from '@/services/auth/auth-service';
+import { useSyncStatus } from '@/services/sync/sync-provider';
 
 const rows = [
   ['○', 'Mi perfil', 'Mis datos y preferencias'],
@@ -30,7 +31,7 @@ const identityCopy: Record<
   anonymous: {
     title: 'Identidad privada preparada',
     text:
-      'EMAÚS ya tiene una identidad anónima para ti, sin pedir correo ni otros datos personales. La sincronización llegará en la siguiente fase.',
+      'EMAÚS ya tiene una identidad anónima para ti, sin pedir correo ni otros datos personales.',
     symbol: '◌',
   },
   permanent: {
@@ -53,14 +54,43 @@ const identityCopy: Record<
   },
 };
 
+function formatSyncDate(value: string | null) {
+  if (!value) return null;
+
+  return new Intl.DateTimeFormat('es-CO', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value));
+}
+
 export default function MeScreen() {
   const {
     status,
     isReady,
     refreshCloudIdentity,
   } = useAuthIdentity();
+  const sync = useSyncStatus();
 
   const cloud = identityCopy[status];
+  const lastSuccess = formatSyncDate(sync.state.lastSuccessAt);
+
+  const syncTitle = !sync.isEnabled
+    ? 'Respaldo aún no activado'
+    : sync.isSyncing
+      ? 'Sincronizando…'
+      : sync.state.lastError
+        ? 'Sincronización pendiente'
+        : lastSuccess
+          ? 'Respaldo al día'
+          : 'Preparando respaldo seguro';
+
+  const syncText = !sync.isEnabled
+    ? 'Tus datos siguen solamente en este dispositivo hasta que terminemos de verificar el aislamiento RLS del proyecto EMAÚS.'
+    : sync.state.lastError
+      ? 'Tus datos locales siguen seguros. EMAÚS volverá a intentarlo sin borrar nada.'
+      : lastSuccess
+        ? `Último respaldo confirmado: ${lastSuccess}. Pendientes: ${sync.state.pendingCount}.`
+        : `Pendientes por respaldar: ${sync.state.pendingCount}.`;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -97,6 +127,34 @@ export default function MeScreen() {
               </Pressable>
             )}
           </View>
+        </View>
+
+        <View style={styles.syncCard}>
+          <View style={styles.syncHeader}>
+            <Text style={styles.syncEyebrow}>RESPALDO SEGURO</Text>
+            <Text style={styles.syncPending}>
+              {sync.state.pendingCount > 0 ? `${sync.state.pendingCount} pendiente(s)` : 'Sin pendientes'}
+            </Text>
+          </View>
+          <Text style={styles.syncTitle}>{syncTitle}</Text>
+          <Text style={styles.syncText}>{syncText}</Text>
+
+          {sync.isEnabled &&
+            (status === 'anonymous' || status === 'permanent') && (
+              <Pressable
+                accessibilityRole="button"
+                disabled={sync.isSyncing}
+                onPress={() => sync.syncNow()}
+                style={({ pressed }) => [
+                  styles.syncButton,
+                  pressed && styles.pressed,
+                  sync.isSyncing && styles.syncButtonDisabled,
+                ]}>
+                <Text style={styles.syncButtonText}>
+                  {sync.isSyncing ? 'Sincronizando…' : 'Sincronizar ahora'}
+                </Text>
+              </Pressable>
+            )}
         </View>
 
         <View style={styles.list}>
@@ -183,6 +241,60 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   pressed: { opacity: 0.75 },
+  syncCard: {
+    borderRadius: radius.lg,
+    backgroundColor: colors.creamElevated,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: spacing.md,
+    gap: spacing.sm,
+    marginBottom: spacing.xl,
+  },
+  syncHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  syncEyebrow: {
+    color: colors.navy,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+  },
+  syncPending: {
+    color: colors.inkSoft,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  syncTitle: {
+    color: colors.navyDeep,
+    fontSize: typeScale.bodySmall,
+    fontWeight: '800',
+  },
+  syncText: {
+    color: colors.inkSoft,
+    fontSize: typeScale.caption,
+    lineHeight: 19,
+  },
+  syncButton: {
+    alignSelf: 'flex-start',
+    minHeight: 38,
+    borderRadius: radius.pill,
+    backgroundColor: colors.navy,
+    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.xs,
+  },
+  syncButtonDisabled: {
+    opacity: 0.55,
+  },
+  syncButtonText: {
+    color: colors.white,
+    fontSize: typeScale.caption,
+    fontWeight: '800',
+  },
   list: { gap: spacing.sm },
   row: {
     minHeight: 68,
