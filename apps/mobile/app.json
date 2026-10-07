@@ -14,6 +14,9 @@
       "package": "com.caminoemaus.emaus",
       "versionCode": 1,
       "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#F8F2E7",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -68,6 +71,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "aa81955d-0e4f-45bc-b08d-9dcf7b07ef54"
+      }
+    },
+    "owner": "aplicacioncamino"
   }
 }
